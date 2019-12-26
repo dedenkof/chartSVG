@@ -1,34 +1,52 @@
-var cheerio = require('gulp-cheerio');
-var gulp = require('gulp');
-var replace = require('gulp-replace');
-var svgmin = require('gulp-svgmin');
-var svgSprite = require('gulp-svg-sprites');
+const cheerio = require('gulp-cheerio');
+	gulp = require('gulp'),
+	replace = require('gulp-replace'),
+	svgmin = require('gulp-svgmin'),
+	svgSprite = require('gulp-svg-sprites');
 
-gulp.task('svgSpriteBuild', () => {
-	return gulp.src('src/assets/animals/*.svg')
+const path = {
+	build: {
+		root: 'build/'
+	},
+	src: {
+		root: 'src/'
+	}
+};
+
+
+		gulp.task('svgSpriteBuild', () => {
+	// get svg
+	return gulp.src('src/img/svg/animals/*.svg', 'src/img/svg/animals/*.svg')
+	// minify svg
 		.pipe(svgmin({
 			js2svg: {
 				pretty: true
 			}
 		}))
+		// remove all fill, style and stroke declarations in out shapes
 		.pipe(cheerio({
-			run: ($) => {
+			run: function ($) {
 				$('[fill]').removeAttr('fill');
+				$('[stroke]').removeAttr('stroke');
 				$('[style]').removeAttr('style');
 			},
-			parserOptions: {
-				xmlMode: true
-			}
+			parserOptions: {xmlMode: true}
 		}))
+		// cheerio plugin create unnecessary string '&gt;', so replace it.
 		.pipe(replace('&gt;', '>'))
+		// build svg sprite
 		.pipe(svgSprite({
-				mode: "symbols",
-				preview: false,
-				selector: "icon-%f",
-				svg: {
-					symbols: 'symbol_sprite.html'
+			mode: {
+				symbol: {
+					sprite: "../sprite.svg",
+					render: {
+						scss: {
+							dest:'../../../sass/_sprite.scss',
+							template: assetsDir + "sass/templates/_sprite_template.scss"
+						}
+					}
 				}
 			}
-		))
-		.pipe(gulp.dest('build/svg/'));
+		}))
+		.pipe(gulp.dest(assetsDir + 'i/sprite/'));
 });
