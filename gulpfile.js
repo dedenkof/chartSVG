@@ -1,29 +1,22 @@
-const cheerio = require('gulp-cheerio');
-	gulp = require('gulp'),
-	replace = require('gulp-replace'),
+const gulp = require('gulp'),
+	svgSprite = require('gulp-svg-sprite'),
 	svgmin = require('gulp-svgmin'),
-	svgSprite = require('gulp-svg-sprites');
+	cheerio = require('gulp-cheerio'),
+	replace = require('gulp-replace');
 
-const path = {
-	build: {
-		root: 'build/'
-	},
-	src: {
-		root: 'src/'
-	}
-};
+var assetsDir = 'assets/',
+	outputDir = 'dist/',
+	buildDir = 'build/';
 
-
-		gulp.task('svgSpriteBuild', () => {
-	// get svg
-	return gulp.src('src/img/svg/animals/*.svg', 'src/img/svg/animals/*.svg')
+gulp.task('svgSpriteBuild', function () {
+	return gulp.src(assetsDir + 'img/icons/**/*.svg')
 	// minify svg
 		.pipe(svgmin({
 			js2svg: {
 				pretty: true
 			}
 		}))
-		// remove all fill, style and stroke declarations in out shapes
+		// remove all fill and style declarations in out shapes
 		.pipe(cheerio({
 			run: function ($) {
 				$('[fill]').removeAttr('fill');
@@ -44,9 +37,10 @@ const path = {
 							dest:'../../../sass/_sprite.scss',
 							template: assetsDir + "sass/templates/_sprite_template.scss"
 						}
-					}
+					},
+					example: true
 				}
 			}
 		}))
-		.pipe(gulp.dest(assetsDir + 'i/sprite/'));
+		.pipe(gulp.dest(assetsDir + 'img/sprite/'));
 });
